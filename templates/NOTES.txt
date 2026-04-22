@@ -1,0 +1,19 @@
+=======================================================================
+Model Provisioner has been deployed!
+=======================================================================
+
+The following models are marked as 'present' and are being provisioned
+or are already available on the cluster:
+
+{{- range .Values.models }}
+{{- if eq .state "present" }}
+  - Model Name: {{ .name }}
+    HF Repo:    {{ .hfRepo }}
+    PVC Name:   {{ .pvcName }}
+{{- end }}
+{{- end }}
+
+To attach a model to your vLLM pods, pass the corresponding 'PVC Name'
+into your vLLM Helm chart. You can also programmatically discover available
+PVCs by querying the 'available-models-registry' ConfigMap in this namespace.
+=======================================================================

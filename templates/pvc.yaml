@@ -1,0 +1,21 @@
+{{- range .Values.models }}
+{{- if eq .state "present" }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .pvcName }}
+  labels:
+    app.kubernetes.io/name: model-provisioner
+    model: {{ .name }}
+spec:
+  accessModes:
+    - {{ $.Values.storage.accessMode }}
+  resources:
+    requests:
+      storage: {{ .size }}
+  {{- if $.Values.storage.storageClass }}
+  storageClassName: {{ $.Values.storage.storageClass }}
+  {{- end }}
+{{- end }}
+{{- end }}

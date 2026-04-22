@@ -1,0 +1,21 @@
+# Default storage configuration
+storage:
+  storageClass: "ocs-storagecluster-cephfs" # Example: ODF CephFS
+  accessMode: ReadWriteMany
+
+huggingface:
+  tokenSecretName: hf-token-secret
+
+# List of models to provision or remove
+models:
+  - name: llama-3-8b
+    hfRepo: "meta-llama/Meta-Llama-3-8B-Instruct"
+    pvcName: "pvc-llama-3-8b"
+    size: "50Gi"
+    state: "present" # 'present' creates the PVC and downloads the model
+
+  - name: mistral-7b
+    hfRepo: "mistralai/Mistral-7B-v0.1"
+    pvcName: "pvc-mistral-7b"
+    size: "40Gi"
+    state: "absent" # 'absent' instructs Helm to delete the PVC and cleanup the Job

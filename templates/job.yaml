@@ -1,0 +1,61 @@
+{{- range .Values.models }}
+{{- if eq .state "present" }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: model-downloader-{{ .name }}
+  labels:
+    app.kubernetes.io/name: model-provisioner
+    model: {{ .name }}
+spec:
+  # Keeps the completed job history around for 10 minutes to review logs if needed
+  ttlSecondsAfterFinished: 600
+  template:
+    spec:
+      restartPolicy: OnFailure
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+      containers:
+        - name: downloader
+          image: python:3.11-slim
+          command: ["/bin/bash", "-c"]
+          args:
+            - |
+              set -e
+              # Setup trap to catch failures and write status
+              trap 'echo "FAILED" > /model-data/.download_status; echo "Download disturbed/failed!"' ERR
+              
+              echo "IN_PROGRESS" > /model-data/.download_status
+              pip install --no-cache-dir -U huggingface_hub
+              
+              echo "Starting download for {{ .hfRepo }}..."
+              huggingface-cli download {{ .hfRepo }} \
+                --local-dir /model-data \
+                --exclude "*.bin" # Omit PyTorch binaries to save space if relying on Safetensors
+              
+              echo "SUCCESS" > /model-data/.download_status
+              echo "Successfully downloaded {{ .hfRepo }} to {{ .pvcName }}"
+          env:
+            - name: HF_HOME
+              value: "/tmp/hf_cache"
+            - name: HF_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $.Values.huggingface.tokenSecretName }}
+                  key: token
+                  optional: true
+          volumeMounts:
+            - name: model-pvc
+              mountPath: /model-data
+            - name: hf-cache
+              mountPath: /tmp/hf_cache
+      volumes:
+        - name: model-pvc
+          persistentVolumeClaim:
+            claimName: {{ .pvcName }}
+        - name: hf-cache
+          emptyDir: {}
+{{- end }}
+{{- end }}
