@@ -14,6 +14,9 @@ spec:
   template:
     spec:
       restartPolicy: OnFailure
+      {{- if $.Values.serviceAccount.create }}
+      serviceAccountName: {{ $.Values.serviceAccount.name }}
+      {{- end }}
       securityContext:
         runAsNonRoot: true
       containers:

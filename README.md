@@ -7,7 +7,7 @@ This Helm chart is designed to decouple the downloading of Large Language Models
 - **Declarative Management:** Set a model's state to `present` to download it, or `absent` to automatically delete the PVC and free up storage.
 - **State Tracking:** Writes a `.download_status` file (`IN_PROGRESS`, `SUCCESS`, `FAILED`) to the PVC so consumer pods know when the model is ready.
 - **Model Registry:** Automatically maintains a Kubernetes `ConfigMap` mapping model names to their underlying PVC names for easy discovery.
-- **Optimized for OpenShift:** Runs as non-root, handles ephemeral storage limits using `emptyDir` caches, and natively supports RWX storage classes like OpenShift Data Foundation (ODF).
+- **Optimized for OpenShift:** Automatically handles SCCs by creating a dedicated Service Account bound to `anyuid`, handles ephemeral storage limits using `emptyDir` caches, and natively supports RWX storage classes like OpenShift Data Foundation (ODF).
 - **Security & Compliance:** Built-in checks to ensure models are from verified providers, use approved open-source licenses, and enforce secure weight formats (`.safetensors`).
 
 ## Prerequisites
@@ -57,6 +57,13 @@ security:
     - "deepseek-ai"
   # Block unsafe legacy PyTorch Pickles (.bin/.pt) and require Safetensors
   requireSafetensors: true
+
+serviceAccount:
+  create: true
+  name: "model-provisioner-sa"
+
+rbac:
+  create: true # Set to true to bind the 'anyuid' SCC required for OpenShift
 
 models:
   - name: deepseek-ocr-2

@@ -24,6 +24,17 @@ security:
   # Block unsafe legacy PyTorch Pickles (.bin/.pt) and require Safetensors
   requireSafetensors: true
 
+# Security and RBAC configuration for OpenShift
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # The name of the service account to use.
+  name: "model-provisioner-sa"
+
+rbac:
+  # Specifies whether to create RBAC rules (binds the anyuid SCC in OpenShift)
+  create: true
+
 # List of models to provision or remove
 models:
   # - name: qwen3-6-35b-a3b
