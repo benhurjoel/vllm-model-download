@@ -4,8 +4,8 @@ storage:
   accessMode: ReadWriteMany
 
 huggingface:
-  # Provide the raw token string here. The chart will generate a Kubernetes Secret for you.
-  # If you switch to an External Secret Provider later, leave this empty.
+  # For ArgoCD or CI/CD pipelines, you can leave this empty in the repo and pass it dynamically
+  # as a Helm parameter (e.g., huggingface.token=hf_YOUR_TOKEN).
   token: ""
   # The name of the secret to create (or the name of the existing external secret).
   tokenSecretName: "hf-token-secret"

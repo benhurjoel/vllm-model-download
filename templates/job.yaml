@@ -16,7 +16,6 @@ spec:
       restartPolicy: OnFailure
       securityContext:
         runAsNonRoot: true
-        runAsUser: 1001
       containers:
         - name: downloader
           image: python:3.11-slim
