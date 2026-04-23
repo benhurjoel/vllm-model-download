@@ -12,11 +12,11 @@ huggingface:
 
 # List of models to provision or remove
 models:
-  - name: qwen3-6-35b-a3b
-    hfRepo: "Qwen/Qwen3.6-35B-A3B"
-    pvcName: "pvc-qwen3-6-35b-a3b"
-    size: "100Gi"
-    state: "present" # 'present' creates the PVC and downloads the model
+  # - name: qwen3-6-35b-a3b
+  #   hfRepo: "Qwen/Qwen3.6-35B-A3B"
+  #   pvcName: "pvc-qwen3-6-35b-a3b"
+  #   size: "100Gi"
+  #   state: "present" # 'present' creates the PVC and downloads the model
 
   - name: deepseek-ocr-2
     hfRepo: "deepseek-ai/DeepseekSeek-OCR-2"
