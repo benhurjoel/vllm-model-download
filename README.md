@@ -8,6 +8,7 @@ This Helm chart is designed to decouple the downloading of Large Language Models
 - **State Tracking:** Writes a `.download_status` file (`IN_PROGRESS`, `SUCCESS`, `FAILED`) to the PVC so consumer pods know when the model is ready.
 - **Model Registry:** Automatically maintains a Kubernetes `ConfigMap` mapping model names to their underlying PVC names for easy discovery.
 - **Optimized for OpenShift:** Runs as non-root, handles ephemeral storage limits using `emptyDir` caches, and natively supports RWX storage classes like OpenShift Data Foundation (ODF).
+- **Security & Compliance:** Built-in checks to ensure models are from verified providers, use approved open-source licenses, and enforce secure weight formats (`.safetensors`).
 
 ## Prerequisites
 
@@ -17,11 +18,12 @@ This Helm chart is designed to decouple the downloading of Large Language Models
 
 ## Installation
 
-### 1. Create the Hugging Face Token Secret
+### 1. Configure the Hugging Face Token
 
-Before deploying the chart, create a secret containing your Hugging Face access token:
+You can either provide your Hugging Face access token directly in the `values.yaml` (the chart will automatically generate a Kubernetes Secret for you), or you can create it manually/externally:
 
 ```bash
+# Only required if you leave the `token` field empty in values.yaml
 kubectl create secret generic hf-token-secret \
   --from-literal=token="hf_YOUR_TOKEN_HERE"
 ```
