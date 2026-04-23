@@ -4,18 +4,34 @@ storage:
   accessMode: ReadWriteMany
 
 huggingface:
-  tokenSecretName: hf-token-secret
+  # Provide the raw token string here. The chart will generate a Kubernetes Secret for you.
+  # If you switch to an External Secret Provider later, leave this empty.
+  token: ""
+  # The name of the secret to create (or the name of the existing external secret).
+  tokenSecretName: "hf-token-secret"
 
 # List of models to provision or remove
 models:
-  - name: llama-3-8b
-    hfRepo: "meta-llama/Meta-Llama-3-8B-Instruct"
-    pvcName: "pvc-llama-3-8b"
-    size: "50Gi"
+  - name: qwen3-6-35b-a3b
+    hfRepo: "Qwen/Qwen3.6-35B-A3B"
+    pvcName: "pvc-qwen3-6-35b-a3b"
+    size: "100Gi"
     state: "present" # 'present' creates the PVC and downloads the model
 
-  - name: mistral-7b
-    hfRepo: "mistralai/Mistral-7B-v0.1"
-    pvcName: "pvc-mistral-7b"
-    size: "40Gi"
-    state: "absent" # 'absent' instructs Helm to delete the PVC and cleanup the Job
+  - name: deepseek-ocr-2
+    hfRepo: "deepseek-ai/DeepseekSeek-OCR-2"
+    pvcName: "pvc-deepseek-ocr-2"
+    size: "50Gi"
+    state: "present"
+
+  - name: qwen2-vl-embedding-8b
+    hfRepo: "Qwen/Qwen2-VL-Embedding-8B"
+    pvcName: "pvc-qwen2-vl-embedding-8b"
+    size: "25Gi"
+    state: "present"
+
+  - name: qwen3-embedding-4b
+    hfRepo: "Qwen/Qwen3-Embedding-4B"
+    pvcName: "pvc-qwen3-embedding-4b"
+    size: "15Gi"
+    state: "present"
