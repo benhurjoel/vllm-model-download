@@ -38,12 +38,30 @@ storage:
   accessMode: ReadWriteMany
 
 huggingface:
-  tokenSecretName: hf-token-secret
+  # Provide the raw token string here. The chart will generate a Kubernetes Secret for you.
+  # If you switch to an External Secret Provider later, leave this empty.
+  token: "hf_YOUR_TOKEN_HERE"
+  # The name of the secret to create (or the name of the existing external secret).
+  tokenSecretName: "hf-token-secret"
+
+security:
+  # Enforce compliance checks before downloading
+  enabled: true
+  # List of approved Hugging Face license tags (e.g., apache-2.0, mit)
+  allowedLicenses:
+    - "apache-2.0"
+    - "mit"
+  # List of verified/authentic providers (repo namespaces)
+  trustedProviders:
+    - "Qwen"
+    - "deepseek-ai"
+  # Block unsafe legacy PyTorch Pickles (.bin/.pt) and require Safetensors
+  requireSafetensors: true
 
 models:
-  - name: llama-3-8b
-    hfRepo: "meta-llama/Meta-Llama-3-8B-Instruct"
-    pvcName: "pvc-llama-3-8b"
+  - name: deepseek-ocr-2
+    hfRepo: "deepseek-ai/DeepseekSeek-OCR-2"
+    pvcName: "pvc-deepseek-ocr-2"
     size: "50Gi"
     state: "present"
 ```

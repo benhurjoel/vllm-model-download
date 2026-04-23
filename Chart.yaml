@@ -1,0 +1,6 @@
+apiVersion: v2
+name: vllm-download
+description: A Helm chart for declarative downloading of Hugging Face LLMs into PVCs
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
