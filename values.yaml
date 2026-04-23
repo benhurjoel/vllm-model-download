@@ -10,6 +10,20 @@ huggingface:
   # The name of the secret to create (or the name of the existing external secret).
   tokenSecretName: "hf-token-secret"
 
+security:
+  # Enforce compliance checks before downloading
+  enabled: true
+  # List of approved Hugging Face license tags (e.g., apache-2.0, mit, llama3)
+  allowedLicenses:
+    - "apache-2.0"
+    - "mit"
+  # List of verified/authentic providers (repo namespaces)
+  trustedProviders:
+    - "Qwen"
+    - "deepseek-ai"
+  # Block unsafe legacy PyTorch Pickles (.bin/.pt) and require Safetensors
+  requireSafetensors: true
+
 # List of models to provision or remove
 models:
   # - name: qwen3-6-35b-a3b
