@@ -154,33 +154,33 @@ spec:
             - name: SECURITY_ENABLED
               value: "{{ $.Values.security.enabled }}"
             - name: ALLOWED_LICENSES
-              {{- if $.Values.security.allowedLicenses }}
+              {{ if $.Values.security.allowedLicenses }}
               value: {{ join "," $.Values.security.allowedLicenses | quote }}
-              {{- else }}
+              {{ else }}
               value: ""
-              {{- end }}
+              {{ end }}
             - name: TRUSTED_PROVIDERS
               value: {{ join "," $.Values.security.trustedProviders | quote }}
             - name: REQUIRE_SAFETENSORS
               value: {{ $.Values.security.requireSafetensors | quote }}
-            {{- if $.Values.proxy.httpProxy }}
+            {{ if $.Values.proxy.httpProxy }}
             - name: HTTP_PROXY
               value: {{ $.Values.proxy.httpProxy | quote }}
             - name: http_proxy
               value: {{ $.Values.proxy.httpProxy | quote }}
-            {{- end }}
-            {{- if $.Values.proxy.httpsProxy }}
+            {{ end }}
+            {{ if $.Values.proxy.httpsProxy }}
             - name: HTTPS_PROXY
               value: {{ $.Values.proxy.httpsProxy | quote }}
             - name: https_proxy
               value: {{ $.Values.proxy.httpsProxy | quote }}
-            {{- end }}
-            {{- if $.Values.proxy.noProxy }}
+            {{ end }}
+            {{ if $.Values.proxy.noProxy }}
             - name: NO_PROXY
               value: {{ $.Values.proxy.noProxy | quote }}
             - name: no_proxy
               value: {{ $.Values.proxy.noProxy | quote }}
-            {{- end }}
+            {{ end }}
             - name: NODE_USE_ENV_PROXY
               value: "1"
           volumeMounts:
