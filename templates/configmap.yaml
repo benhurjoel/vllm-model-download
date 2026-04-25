@@ -7,8 +7,8 @@ metadata:
 data:
   # This acts as a cluster-internal registry. Other charts, scripts, or operators 
   # can read this to discover the exact PVC name associated with a downloaded model.
-  {{- range .Values.models }}
-  {{- if eq .state "present" }}
+  {{ range .Values.models }}
+  {{ if eq .state "present" }}
   {{ .name }}: {{ .pvcName }}
-  {{- end }}
-  {{- end }}
+  {{ end }}
+  {{ end }}
