@@ -36,6 +36,24 @@ spec:
             - |
               set -e
               cd /tmp
+
+              # --- Proxy Normalization ---
+              # Many tools fail with "NONE/0.0" if the proxy string lacks a scheme (http://)
+              normalize_proxy() {
+                local p=$1
+                if [ -z "$p" ]; then echo ""; return; fi
+                if [[ ! $p =~ ^http:// ]] && [[ ! $p =~ ^https:// ]]; then
+                  echo "http://$p"
+                else
+                  echo "$p"
+                fi
+              }
+
+              export HTTP_PROXY=$(normalize_proxy "$HTTP_PROXY")
+              export HTTPS_PROXY=$(normalize_proxy "$HTTPS_PROXY")
+              export http_proxy=$(normalize_proxy "$http_proxy")
+              export https_proxy=$(normalize_proxy "$https_proxy")
+
               # Setup trap to catch failures and write status
               trap 'echo "FAILED" > /model-data/.download_status; echo "Download disturbed/failed!"' ERR
               
