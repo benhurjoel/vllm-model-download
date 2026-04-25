@@ -4,7 +4,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: download-{{ .name | replace "_" "-" }}
+  name: {{ printf "dl-%s-%s" (.name | replace "_" "-" | trunc 45) (. | toYaml | sha256sum | trunc 7) }}
   labels:
     app.kubernetes.io/name: model-provisioner
     model: {{ .name }}
