@@ -1,10 +1,11 @@
 {{- range .Values.models }}
 {{- if eq .state "present" }}
+{{- $configHash := (dict "model" . "proxy" $.Values.proxy "security" $.Values.security "huggingface" $.Values.huggingface "serviceAccount" $.Values.serviceAccount) | toYaml | sha256sum -}}
 ---
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ printf "dl-%s-%s" (.name | replace "_" "-" | trunc 45) (. | toYaml | sha256sum | trunc 7) }}
+  name: {{ printf "dl-%s-%s" (.name | replace "_" "-" | trunc 45) ($configHash | trunc 7) }}
   labels:
     app.kubernetes.io/name: model-provisioner
     model: {{ .name }}
@@ -19,7 +20,7 @@ spec:
       annotations:
         # This annotation ensures that if the Pod template changes, a new Job is created.
         # This is crucial for Jobs as their Pod templates are immutable after creation.
-        checksum/config: {{ . | toYaml | sha256sum }}
+        checksum/config: {{ $configHash }}
     spec:
       serviceAccountName: {{ $.Values.serviceAccount.name }}
       restartPolicy: OnFailure
