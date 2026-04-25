@@ -40,7 +40,38 @@ spec:
               trap 'echo "FAILED" > /model-data/.download_status; echo "Download disturbed/failed!"' ERR
               
               echo "IN_PROGRESS" > /model-data/.download_status
-              pip install --no-cache-dir --user -U huggingface_hub
+
+              # --- Proxy Connectivity Check ---
+              CHECK_PROXY=""
+              if [ ! -z "$HTTPS_PROXY" ]; then CHECK_PROXY=$HTTPS_PROXY
+              elif [ ! -z "$http_proxy" ]; then CHECK_PROXY=$http_proxy
+              fi
+
+              if [ ! -z "$CHECK_PROXY" ]; then
+                echo "Verifying proxy connectivity: $CHECK_PROXY"
+                # Extract host and port for a TCP check
+                PROXY_HOST=$(echo $CHECK_PROXY | sed -e 's|https://||' -e 's|http://||' -e 's|/.*||' | cut -d: -f1)
+                PROXY_PORT=$(echo $CHECK_PROXY | sed -e 's|https://||' -e 's|http://||' -e 's|/.*||' | cut -s -d: -f2)
+                PROXY_PORT=${PROXY_PORT:-8080}
+                
+                if ! timeout 5 bash -c "cat < /dev/tcp/$PROXY_HOST/$PROXY_PORT" > /dev/null 2>&1; then
+                  echo "ERROR: Network cannot reach proxy at $PROXY_HOST:$PROXY_PORT"
+                  echo "Please check if the proxy URL is correct and reachable from this namespace."
+                  exit 1
+                fi
+                echo "Proxy is reachable."
+              fi
+              
+              # --- Pip Installation ---
+              PIP_PROXY_ARG=""
+              [ ! -z "$CHECK_PROXY" ] && PIP_PROXY_ARG="--proxy $CHECK_PROXY"
+
+              echo "Installing huggingface_hub..."
+              # Use trusted-host to bypass SSL issues common with corporate proxies
+              python3 -m pip install $PIP_PROXY_ARG --no-cache-dir --user -U huggingface_hub \
+                --trusted-host pypi.org \
+                --trusted-host pypi.python.org \
+                --trusted-host files.pythonhosted.org
               
               echo "Starting download for {{ .hfRepo }}..."
               
@@ -114,19 +145,26 @@ spec:
             - name: REQUIRE_SAFETENSORS
               value: "{{ $.Values.security.requireSafetensors }}"
             # Standard Proxy Env Vars
+            {{- if $.Values.proxy.httpProxy }}
             - name: HTTP_PROXY
               value: {{ $.Values.proxy.httpProxy | quote }}
-            - name: HTTPS_PROXY
-              value: {{ $.Values.proxy.httpsProxy | quote }}
-            - name: NO_PROXY
-              value: {{ $.Values.proxy.noProxy | quote }}
             - name: http_proxy
               value: {{ $.Values.proxy.httpProxy | quote }}
+            {{- end }}
+            {{- if $.Values.proxy.httpsProxy }}
+            - name: HTTPS_PROXY
+              value: {{ $.Values.proxy.httpsProxy | quote }}
             - name: https_proxy
               value: {{ $.Values.proxy.httpsProxy | quote }}
+            {{- end }}
+            {{- if $.Values.proxy.noProxy }}
+            - name: NO_PROXY
+              value: {{ $.Values.proxy.noProxy | quote }}
             - name: no_proxy
               value: {{ $.Values.proxy.noProxy | quote }}
+            {{- end }}
             # Node/Agent Proxy configuration
+            # Note: Kubernetes env names cannot contain dashes. Using underscore.
             - name: NODE_USE_ENV_PROXY
               value: "1"
           volumeMounts:
