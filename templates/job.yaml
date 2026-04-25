@@ -136,13 +136,13 @@ spec:
               snapshot_download(repo_id=repo_id, local_dir='/model-data', ignore_patterns=ignore_patterns)
               EOF
               
-              export PATH=$PATH:$(python -m site --user-base)/bin
+              export PATH="$PATH:$(python3 -m site --user-base)/bin"
               python /tmp/verify_and_download.py
               
               echo "SUCCESS" > /model-data/.download_status
           env:
             - name: HOME
-              value: "/tmp"
+              value: /tmp
             - name: HF_HOME
               value: "/tmp/hf_cache"
             - name: HF_TOKEN
@@ -154,34 +154,34 @@ spec:
             - name: SECURITY_ENABLED
               value: "{{ $.Values.security.enabled }}"
             - name: ALLOWED_LICENSES
-              {{ if $.Values.security.allowedLicenses }}
+              {{- if $.Values.security.allowedLicenses }}
               value: "{{ join "," $.Values.security.allowedLicenses }}"
-              {{ else }}
+              {{- else }}
               value: ""
-              {{ end }}
+              {{- end }}
             - name: TRUSTED_PROVIDERS
               value: "{{ join "," $.Values.security.trustedProviders }}"
             - name: REQUIRE_SAFETENSORS
               value: "{{ $.Values.security.requireSafetensors }}"
             # Standard Proxy Env Vars
-            {{ if $.Values.proxy.httpProxy }}
+            {{- if $.Values.proxy.httpProxy }}
             - name: HTTP_PROXY
               value: {{ $.Values.proxy.httpProxy | quote }}
             - name: http_proxy
               value: {{ $.Values.proxy.httpProxy | quote }}
-            {{ end }}
-            {{ if $.Values.proxy.httpsProxy }}
+            {{- end }}
+            {{- if $.Values.proxy.httpsProxy }}
             - name: HTTPS_PROXY
               value: {{ $.Values.proxy.httpsProxy | quote }}
             - name: https_proxy
               value: {{ $.Values.proxy.httpsProxy | quote }}
-            {{ end }}
-            {{ if $.Values.proxy.noProxy }}
+            {{- end }}
+            {{- if $.Values.proxy.noProxy }}
             - name: NO_PROXY
               value: {{ $.Values.proxy.noProxy | quote }}
             - name: no_proxy
               value: {{ $.Values.proxy.noProxy | quote }}
-            {{ end }}
+            {{- end }}
             # Node/Agent Proxy configuration
             # Note: Kubernetes env names cannot contain dashes. Using underscore.
             - name: NODE_USE_ENV_PROXY
@@ -197,5 +197,5 @@ spec:
             claimName: {{ .pvcName }}
         - name: hf-cache
           emptyDir: {}
-{{- end -}}
-{{- end -}}
+{{- end }}
+{{- end }}
