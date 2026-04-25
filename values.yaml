@@ -10,6 +10,14 @@ huggingface:
   # The name of the secret to create (or the name of the existing external secret).
   tokenSecretName: "hf-token-secret"
 
+proxy:
+  # If your cluster is behind a proxy, specify the URLs here.
+  # Example: "http://proxy.example.com:8080"
+  httpProxy: ""
+  httpsProxy: ""
+  # Comma-separated list of hosts that should exclude proxying
+  noProxy: ".cluster.local,.svc,localhost,127.0.0.1"
+
 security:
   # Enforce compliance checks before downloading
   enabled: true

@@ -4,7 +4,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: model-downloader-{{ .name }}
+  name: download-{{ .name | replace "_" "-" }}
   labels:
     app.kubernetes.io/name: model-provisioner
     model: {{ .name }}
@@ -17,11 +17,9 @@ spec:
         app.kubernetes.io/name: model-provisioner
         model: {{ .name }}
     spec:
+      serviceAccountName: {{ $.Values.serviceAccount.name }}
       restartPolicy: OnFailure
       terminationGracePeriodSeconds: 5
-      {{- if $.Values.serviceAccount.create }}
-      serviceAccountName: {{ $.Values.serviceAccount.name }}
-      {{- end }}
       securityContext:
         runAsNonRoot: true
       containers:
@@ -100,11 +98,26 @@ spec:
               value: "{{ join "," $.Values.security.allowedLicenses }}"
               {{- else }}
               value: ""
-              {{- end }}
             - name: TRUSTED_PROVIDERS
               value: "{{ join "," $.Values.security.trustedProviders }}"
             - name: REQUIRE_SAFETENSORS
               value: "{{ $.Values.security.requireSafetensors }}"
+            # Standard Proxy Env Vars
+            - name: HTTP_PROXY
+              value: {{ $.Values.proxy.httpProxy | quote }}
+            - name: HTTPS_PROXY
+              value: {{ $.Values.proxy.httpsProxy | quote }}
+            - name: NO_PROXY
+              value: {{ $.Values.proxy.noProxy | quote }}
+            - name: http_proxy
+              value: {{ $.Values.proxy.httpProxy | quote }}
+            - name: https_proxy
+              value: {{ $.Values.proxy.httpsProxy | quote }}
+            - name: no_proxy
+              value: {{ $.Values.proxy.noProxy | quote }}
+            # Node/Agent Proxy configuration
+            - name: NODE_USE_ENV_PROXY
+              value: "1"
           volumeMounts:
             - name: model-pvc
               mountPath: /model-data

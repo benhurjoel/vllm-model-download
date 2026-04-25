@@ -44,6 +44,11 @@ huggingface:
   # The name of the secret to create (or the name of the existing external secret).
   tokenSecretName: "hf-token-secret"
 
+proxy:
+  httpProxy: "http://proxy.example.com:8080"
+  httpsProxy: "http://proxy.example.com:8080"
+  noProxy: ".cluster.local,.svc,localhost,127.0.0.1"
+
 security:
   # Enforce compliance checks before downloading
   enabled: true
