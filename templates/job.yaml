@@ -98,6 +98,7 @@ spec:
               value: "{{ join "," $.Values.security.allowedLicenses }}"
               {{- else }}
               value: ""
+              {{- end }}
             - name: TRUSTED_PROVIDERS
               value: "{{ join "," $.Values.security.trustedProviders }}"
             - name: REQUIRE_SAFETENSORS
