@@ -1,4 +1,3 @@
-{{- define "vllm-model-download.jobPodSpec" -}}
 {{- range .Values.models }}
 {{- if eq .state "present" }}
 ---
@@ -20,7 +19,7 @@ spec:
       annotations:
         # This annotation ensures that if the Pod template changes, a new Job is created.
         # This is crucial for Jobs as their Pod templates are immutable after creation.
-        checksum/pod-template: {{ include "vllm-model-download.jobPodSpec" . | sha256sum }}
+        checksum/config: {{ . | toYaml | sha256sum }}
     spec:
       serviceAccountName: {{ $.Values.serviceAccount.name }}
       restartPolicy: OnFailure
@@ -142,5 +141,3 @@ spec:
         - name: hf-cache
           emptyDir: {}
 {{- end -}}
-{{- end }}
-{{- end }}
