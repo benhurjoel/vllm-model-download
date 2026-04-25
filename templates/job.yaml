@@ -22,6 +22,8 @@ spec:
       terminationGracePeriodSeconds: 5
       securityContext:
         runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
       containers:
         - name: downloader
           image: python:3.11-slim
@@ -29,11 +31,12 @@ spec:
           args:
             - |
               set -e
+              cd /tmp
               # Setup trap to catch failures and write status
               trap 'echo "FAILED" > /model-data/.download_status; echo "Download disturbed/failed!"' ERR
               
               echo "IN_PROGRESS" > /model-data/.download_status
-              pip install --no-cache-dir -U huggingface_hub
+              pip install --no-cache-dir --user -U huggingface_hub
               
               echo "Starting download for {{ .hfRepo }}..."
               
@@ -79,10 +82,13 @@ spec:
               snapshot_download(repo_id=repo_id, local_dir='/model-data', ignore_patterns=ignore_patterns)
               EOF
               
-              python verify_and_download.py
+              export PATH=$PATH:$(python -m site --user-base)/bin
+              python /tmp/verify_and_download.py
               
               echo "SUCCESS" > /model-data/.download_status
           env:
+            - name: HOME
+              value: "/tmp"
             - name: HF_HOME
               value: "/tmp/hf_cache"
             - name: HF_TOKEN
